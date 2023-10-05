@@ -204,8 +204,61 @@ describe("Staking Rewards", () => {
   });
   
   describe("Withdraw", () => {
-    it("", async () => {
-    
+    it("claim reward by user", async () => {
+      const {
+        lpToken,
+        rewardToken,
+        stakingRewards,
+        owner,
+        user,
+        stakingRewardsAddress
+      } = await loadFixture(deployStakingRewardsSetup);
+      
+      await lpToken.connect(user).mint();
+      await rewardToken.connect(owner).mint();
+      
+      const lpAmount = await lpToken.balanceOf(user.address);
+      await lpToken.connect(user).approve(stakingRewardsAddress, lpAmount);
+      await stakingRewards.connect(user).stake(lpAmount);
+      
+      const rewardAmount = await rewardToken.balanceOf(owner.address);
+      await rewardToken.connect(owner).transfer(stakingRewardsAddress, rewardAmount);
+      await stakingRewards.notifyRewardAmount(rewardAmount);
+
+      const SECONDS_IN_WEEK = 604800;
+      const expectedRewardAmount = rewardAmount * bigInt(9999) / bigInt(10000);
+      expect(await stakingRewards.earned(user.address)).to.be.equal(0);
+      
+      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_WEEK / 2]);
+      await ethers.provider.send("evm_mine");
+      expect(await stakingRewards.earned(user.address))
+        .to.be.gte(expectedRewardAmount / bigInt(2));
+  
+      await ethers.provider.send("evm_increaseTime", [SECONDS_IN_WEEK / 2]);
+      await ethers.provider.send("evm_mine");
+      expect(await stakingRewards.earned(user.address))
+        .to.be.gte(expectedRewardAmount / bigInt(2));
+      
+      
+      expect(await lpToken.balanceOf(user.address)).to.be.equal(0);
+      expect(await rewardToken.balanceOf(user.address)).to.be.equal(0);
+      expect(await lpToken.balanceOf(stakingRewardsAddress)).to.be.equal(lpAmount);
+      expect(await rewardToken.balanceOf(stakingRewardsAddress)).to.be.equal(rewardAmount);
+      
+      await stakingRewards.connect(user).getReward();
+  
+      expect(await lpToken.balanceOf(user.address)).to.be.equal(0);
+      expect(await rewardToken.balanceOf(user.address)).to.be.gte(expectedRewardAmount);
+      expect(await lpToken.balanceOf(stakingRewardsAddress)).to.be.equal(lpAmount);
+      expect(await rewardToken.balanceOf(stakingRewardsAddress))
+        .to.be.lt(bigInt(rewardAmount) - expectedRewardAmount);
+      
+      await stakingRewards.connect(user).exit();
+      expect(await lpToken.balanceOf(user.address)).to.be.equal(lpAmount);
+      expect(await rewardToken.balanceOf(user.address)).to.be.gte(expectedRewardAmount);
+      expect(await lpToken.balanceOf(stakingRewardsAddress)).to.be.equal(0);
+      expect(await rewardToken.balanceOf(stakingRewardsAddress))
+        .to.be.lt(bigInt(rewardAmount) - expectedRewardAmount);
     });
   })
 });
