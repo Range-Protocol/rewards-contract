@@ -12,8 +12,8 @@ async function main() {
   const ledger = await new LedgerSigner(provider, "");
   
   const owner = ""; // to be updated.
-  const stakingToken = ""; // to be updated.
-  const rewardToken = ""; // to be updated.
+  const stakingToken = "0xC878986158ecC8Bf91BD7432bb336204a75Db7e9";
+  const rewardToken = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9";
   const rewardDistributor = ""; // to be updated.
   
   const stakingRewards = await hre.ethers.deployContract("StakingRewards", [
