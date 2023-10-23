@@ -6,7 +6,9 @@ module.exports = {
     apiKey: "",
   },
   networks: {
-    hardhat: {},
+    hardhat: {
+      forking: { url: "https://1rpc.io/mantle"}
+    },
     mainnet: {
       accounts: [],
       chainId: 1,

@@ -12,18 +12,25 @@ async function main() {
   const ledger = await new LedgerSigner(provider, "");
   
   const owner = ""; // to be updated.
-  const stakingToken = "0xC878986158ecC8Bf91BD7432bb336204a75Db7e9";
-  const rewardToken = "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9";
   const rewardDistributor = ""; // to be updated.
+  const rewardToken = "0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8"; // WMNT https://www.coingecko.com/en/coins/wrapped-mantle
+  // Range iZUMi WETH/USDT 0.30% Passive LP (R-UNI) https://explorer.mantle.xyz/address/0xE441d252a5686450543C5FfF85Bb06f7c9B6843e
+  const stakingToken = "0xE441d252a5686450543C5FfF85Bb06f7c9B6843e";
   
-  const stakingRewards = await hre.ethers.deployContract("StakingRewards", [
+  const StakingRewards = (await hre.ethers.getContractFactory("StakingRewards"))
+    .connect(ledger);
+  
+  // address _owner,
+  // address _rewardsDistribution,
+  // address _rewardsToken,
+  // address _stakingToken
+  const stakingRewards = await StakingRewards.deploy(
     owner,
     rewardDistributor,
     rewardToken,
-    stakingToken,
-  ]);
-  await stakingRewards.waitForDeployment();
-  console.log("Staking Rewards: ", await stakingRewards.getAddress());
+    stakingToken
+  );
+  console.log("Staking Rewards: ", stakingRewards.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

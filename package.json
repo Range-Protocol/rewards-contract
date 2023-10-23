@@ -10,8 +10,8 @@
   "license": "ISC",
   "devDependencies": {
     "@anders-t/ethers-ledger": "^1.0.4",
-    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
-    "hardhat": "^2.17.4"
+    "@nomicfoundation/hardhat-toolbox": "2.0.2",
+    "hardhat": "^2.13.0"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^2.3.0"
